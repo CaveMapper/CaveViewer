@@ -24,21 +24,6 @@
       </div>
     </div>
     <script>
-        var gameInstance = UnityLoader.instantiate(
-            "gameContainer",
-            "Build/App.json",
-            {
-                onProgress: UnityProgress,
-                Module: { TOTAL_STACK: 6 * 1024 * 1024 }
-            });
-
-        setInterval(function () {
-            var text = "";
-            for (var i = 0; i < 5 * 1024 * 1024 / 4; i++) {
-                text += "*";
-            }
-            gameInstance.SendMessage('MyGameObject', 'MyFunction', text);
-        }, 1000);
 
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
