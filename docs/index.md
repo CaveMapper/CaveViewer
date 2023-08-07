@@ -1,4 +1,3 @@
-# 洞窟3Dデータ　ライブラリ
 
 ## 操作方法
 
@@ -6,6 +5,7 @@
 
 ※モバイルでは正常に動作しない場合があります
 
-##ライブラリ
+
+## 洞窟3Dデータ ライブラリ
 
 <a href = "https://github.com/CaveMapper/CaveViewer/AokuraNo1/index.html" >**青倉第一／Aokura No1 Cave**</a>
