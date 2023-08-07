@@ -8,4 +8,4 @@
 
 ## 洞窟3Dデータ ライブラリ
 
-<a href = "https://github.com/CaveMapper/CaveViewer/AokuraNo1/index.html" >**青倉第一／Aokura No1 Cave**</a>
+<a href = "https://cavemapper.github.io/CaveViewer/AokuraNo1/" >**青倉第一／Aokura No1 Cave**</a>
