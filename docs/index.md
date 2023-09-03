@@ -22,3 +22,7 @@
 <a href = "https://cavemapper.github.io/CaveViewer/Ochigawa_Shindo/" >**大血川新洞／Ochigawa Shindo**</a>  
   
 大沢の熊穴（スキャン途中）  
+
+<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_hotokeana/" >**乙父沢仏穴／Occhizawa Hotokeana**</a>  
+
+<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_hotokeana_chokujyo_no_ana/" >**乙父沢仏穴直上の穴(仮称)／Occhizawa Hotokeana Chokujyo no Ana**</a>  
