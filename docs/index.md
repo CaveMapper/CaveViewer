@@ -23,6 +23,6 @@
   
 大沢の熊穴（スキャン途中）  
 
-<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Hotoke_ana/" >**乙父沢仏穴／Occhizawa Hotoke ana**</a>  
+<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Hotoke_ana/" >**乙父沢仏穴／Occhizawa Hotoke ana**</a>  （実は「観音穴」だった。修正予定。）
 
-<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Bakuchi_ana/" >**乙父沢バクチ穴／Occhizawa Bakuchi Ana**</a>  （仏穴の直上の穴）
+<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Bakuchi_ana/" >**乙父沢バクチ穴／Occhizawa Bakuchi Ana**</a>  （実は「仏穴」だった。修正予定。）
