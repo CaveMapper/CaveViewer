@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
-    <div>
+    <table>
+    <tr>
     ★をたくさん個集めて入口へ戻ろう！<br>
     <p>
     PCのみ対応<br>
@@ -18,7 +19,8 @@
     <img src="howtoControl.png">
     <p>
     <p>
-    </div>
+    </tr>
+    <tr>
     <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
@@ -34,6 +36,8 @@
         <div id="unity-build-title">CaveViewer</div>
       </div>
     </div>
+    </tr>
+    </table>
     <script>
 
       var container = document.querySelector("#unity-container");
