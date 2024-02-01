@@ -8,19 +8,8 @@
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
-    <div id="unity-container" class="unity-desktop">       
-      <div id="unity-header">
-        <p>
-        ★をたくさん個集めて入口へ戻ろう！<br>
-        <p>
-        PCのみ対応<br>
-        一度画面内をクリックして、マウスカーソルを消してから遊んでください。
-        ESCキーを押すとマウスカーソルが再び表示されます。<br>
-        <p>
-        <div style="text-align: center;"><img src="howtoControl.png"></div>
-        <p>
-      </div>
-      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas> 
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -33,8 +22,17 @@
         <div id="unity-fullscreen-button"></div>
         <div id="unity-build-title">CaveViewer</div>
       </div>
+      <div id="note">
+        <p><br>
+        <div style="text-align: center;">
+        <b>★をたくさん集めて入口へ戻ろう！ </b><br>
+        <p>
+        一度画面内をクリックして、マウスカーソルを消してから遊んでください。ESCキーを押すとマウスカーソルが再び表示されます<br>
+        <p>
+        <img src="howtoControl.png"></div>
+        <p>
+      </div>
     </div>
-
     <script>
 
       var container = document.querySelector("#unity-container");
