@@ -26,3 +26,6 @@
 <a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Hotoke_ana/" >**乙父沢仏穴／Occhizawa Hotoke ana**</a>  （実は「観音穴」だった。修正予定。）
 
 <a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Bakuchi_ana/" >**乙父沢バクチ穴／Occhizawa Bakuchi Ana**</a>  （実は「仏穴」だった。修正予定。）  
+
+## 3Dデータを活用したバーチャル洞窟探索デモ
+<a href = "https://cavemapper.github.io/CaveViewer/CaveExplorer/" >**バーチャル洞窟探索デモ**</a>  【PCでのみ動作】
