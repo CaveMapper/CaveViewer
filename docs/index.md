@@ -19,13 +19,11 @@
     
 <a href = "https://cavemapper.github.io/CaveViewer/Nanakubo_no_Michiana/" >**七久保の道穴／Nanakubo no Michiana**</a>  
   
-<a href = "https://cavemapper.github.io/CaveViewer/Ochigawa_Shindo/" >**大血川新洞／Ochigawa Shindo**</a>  
-  
-大沢の熊穴（スキャン途中）  
+<a href = "https://cavemapper.github.io/CaveViewer/Oochigawa_Shindo/" >**大血川新洞／Oochigawa Shindo**</a>  
 
-<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Hotoke_ana/" >**乙父沢仏穴／Occhizawa Hotoke ana**</a>  （実は「観音穴」だった。修正予定。）
+<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Kannon_ana/" >**乙父沢観音穴／Occhizawa Kannon Ana**</a> 
 
-<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Bakuchi_ana/" >**乙父沢バクチ穴／Occhizawa Bakuchi Ana**</a>  （実は「仏穴」だった。修正予定。）  
+<a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Hotoke_ana/" >**乙父沢仏穴／Occhizawa Hotoke Ana**</a>  
 
 ## バーチャル洞窟探索デモ
 <a href = "https://cavemapper.github.io/CaveViewer/CaveExplorer/" >**バーチャル洞窟探索デモ**</a> 
