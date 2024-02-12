@@ -30,4 +30,4 @@
 
 <p><br>
 <p><br>
-<a href = "https://github.com/CaveMapper/CaveMapper">**TOPに戻る**</a> 
+<a href = "https://github.com/CaveMapper/CaveMapper">TOPに戻る</a> 
