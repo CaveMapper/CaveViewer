@@ -25,7 +25,7 @@
 
 <a href = "https://cavemapper.github.io/CaveViewer/Occhizawa_Hotoke_ana/" >**乙父沢仏穴／Occhizawa Hotoke Ana**</a>  
 
-<a href = "https://cavemapper.github.io/CaveViewer/Sokose_no_ana/" >**底瀬の穴／Sokose　no ana**</a>  
+<a href = "https://cavemapper.github.io/CaveViewer/Sokoze_ana/" >**底瀬穴／Sokoze ana**</a>  
 
 ## バーチャル洞窟探索デモ
 <a href = "https://cavemapper.github.io/CaveViewer/CaveExplorer/" >**バーチャル洞窟探索デモ**</a> 
