@@ -27,6 +27,8 @@
 
 <a href = "https://cavemapper.github.io/CaveViewer/Sokoze_ana/" >**底瀬穴／Sokoze ana**</a>  
 
+<a href = "https://cavemapper.github.io/CaveViewer/Oosawa_no_Kumaana/" >**大沢の熊穴／Oosawa no Kumaana**</a> 
+
 ## バーチャル洞窟探索デモ
 <a href = "https://cavemapper.github.io/CaveViewer/CaveExplorer/" >**バーチャル洞窟探索デモ**</a> 
 
