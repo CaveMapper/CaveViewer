@@ -1,6 +1,5 @@
 ## 操作方法  
-![操作方法](howtouse.png)   
-※モバイルによる表示では正常に動作しない場合があります。  
+![操作方法](howtouse.png)    
 ※1つの洞窟データにつき30～100MB程度のサイズがあります。  
   
   
@@ -27,7 +26,7 @@
 
 <a href = "https://cavemapper.github.io/CaveViewer/Sokoze_ana/" >**底瀬穴／Sokoze ana**</a>  
 
-<a href = "https://cavemapper.github.io/CaveViewer/Hyobaku_ana_/" >**氷瀑穴／Hyobaku ana**</a> 
+<a href = "https://cavemapper.github.io/CaveViewer/Hyobaku_ana/" >**氷瀑穴／Hyobaku ana**</a> 
 
 <a href = "https://cavemapper.github.io/CaveViewer/Oosawa_no_Kumaana/" >**大沢の熊穴／Oosawa no Kumaana**</a> 
 
