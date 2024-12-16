@@ -30,6 +30,8 @@
 
 <a href = "https://cavemapper.github.io/CaveViewer/Oosawa_no_Kumaana/" >**大沢の熊穴／Oosawa no Kumaana**</a> 
 
+<a href = "https://cavemapper.github.io/CaveViewer/Chankara__ana/" >**ちゃんから穴／Chankara ana**</a> 
+
 ## バーチャル洞窟探索デモ
 <a href = "https://cavemapper.github.io/CaveViewer/CaveExplorer/" >**バーチャル洞窟探索デモ**</a> 
 
