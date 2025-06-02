@@ -34,6 +34,8 @@
 
 <a href = "https://cavemapper.github.io/CaveViewer/Hebara_no_kakure_ana/" >**平原の隠れ穴／Hebara no kakure ana**</a> 
 
+<a href = "https://cavemapper.github.io/CaveViewer/Banba_ana/">**婆々穴／Banba ana**</a>
+
 ## バーチャル洞窟探索デモ
 <a href = "https://cavemapper.github.io/CaveViewer/CaveExplorer/" >**バーチャル洞窟探索デモ**</a> 
 
