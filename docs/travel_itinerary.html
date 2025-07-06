@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スイス家族旅行のしおり</title>
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 12mm;
+                font-size: 10pt;
+                line-height: 1.2;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .no-print {
+                display: none;
+            }
+            .day-section {
+                margin: 0;
+                padding: 15px;
+                page-break-after: always;
+                page-break-inside: avoid;
+                height: auto;
+                min-height: 0;
+                max-height: 260mm;
+                overflow: hidden;
+            }
+            .day-section:last-child {
+                page-break-after: auto;
+            }
+            .header {
+                page-break-after: always;
+            }
+            .schedule-item {
+                margin: 8px 0;
+                padding: 8px;
+            }
+            .accommodation {
+                padding: 8px;
+                margin-top: 8px;
+            }
+            .memo {
+                padding: 10px;
+                margin: 15px 0;
+            }
+            .important {
+                padding: 8px;
+                margin: 8px 0;
+            }
+        }
+        
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #c41e3a;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #c41e3a;
+            font-size: 28px;
+            margin: 0 0 10px 0;
+        }
+        
+        .trip-info {
+            font-size: 16px;
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        .day-section {
+            margin: 30px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fafafa;
+            page-break-after: always;
+        }
+        
+        .day-header {
+            background-color: #c41e3a;
+            color: white;
+            padding: 12px 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 7px 7px 0 0;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .schedule-item {
+            margin: 15px 0;
+            padding: 10px;
+            border-left: 4px solid #c41e3a;
+            background-color: white;
+            border-radius: 4px;
+        }
+        
+        .time {
+            font-weight: bold;
+            color: #c41e3a;
+            font-size: 16px;
+        }
+        
+        .location {
+            font-weight: bold;
+            color: #333;
+            margin: 5px 0;
+        }
+        
+        .activity {
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .transport {
+            color: #999;
+            font-style: italic;
+            margin: 5px 0;
+        }
+        
+        .accommodation {
+            background-color: #e8f4f8;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .flight-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .important {
+            background-color: #ffe6e6;
+            border: 1px solid #ff9999;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .memo {
+            border: 1px dashed #ccc;
+            padding: 15px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .memo h4 {
+            margin: 0 0 10px 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🇨🇭 スイス家族旅行のしおり</h1>
+        <div class="trip-info">2025年7月19日 - 8月3日 (16日間)</div>
+        <div class="trip-info">予約コード: L642YW</div>
+    </div>
+
+    <!-- 7月19日 -->
+    <div class="day-section">
+        <div class="day-header">7月19日 (土) - 出発日</div>
+        
+        <div class="schedule-item">
+            <div class="time">10:55</div>
+            <div class="location">成田空港 (NRT) 出発</div>
+            <div class="activity">SWISS LX161便 → チューリッヒ</div>
+            <div class="transport">フライト時間: 約14時間25分</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">18:20 (現地時間)</div>
+            <div class="location">チューリッヒ空港 (ZRH) 到着</div>
+            <div class="activity">入国・荷物受取</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">19:00頃</div>
+            <div class="location">チューリッヒ空港 Coop</div>
+            <div class="activity">夕食の買い出し</div>
+            <div class="transport">空港内のCoopで食料品購入</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">時間があれば</div>
+            <div class="location">SBBトラベルセンター (Check-in 3エリア地下)</div>
+            <div class="activity">ハーフフェアカード購入</div>
+            <div class="transport">営業時間: 06:30-21:00 (間に合わなければ翌日購入)</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">夕食後</div>
+            <div class="location">空港内・ホテル</div>
+            <div class="activity">夕食・休憩</div>
+            <div class="transport">翌日のレンタカー受取準備</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> Hyatt Place Zurich Airport the Circle
+        </div>
+    </div>
+
+    <!-- 7月20日 -->
+    <div class="day-section">
+        <div class="day-header">7月20日 (日) - チューリッヒ → シルス</div>
+        
+        <div class="schedule-item">
+            <div class="time">06:30-07:00</div>
+            <div class="location">SBBトラベルセンター → レンタカーカウンター</div>
+            <div class="activity">ハーフフェアカード購入（前日未購入の場合）→ Hertzレンタカー受取</div>
+            <div class="transport">VWポロ（8/2 12:00まで）</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">08:00</div>
+            <div class="location">チューリッヒ → アッペンツェル方面</div>
+            <div class="activity">ドライブ開始</div>
+            <div class="transport">Parkplatz Wasserauenを経由してシルスへ</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">10:00頃</div>
+            <div class="location">Parkplatz Wasserauen</div>
+            <div class="activity">駐車・ハイキング準備</div>
+            <div class="transport">車を駐車場に停めて徒歩開始</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">10:30-13:00</div>
+            <div class="location">Aescher Aussichtspunkt</div>
+            <div class="activity">観光・ハイキング</div>
+            <div class="transport">徒歩（往復約2.5時間）</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">時間があれば</div>
+            <div class="location">Frümsen → Saxer Lücke</div>
+            <div class="activity">追加観光</div>
+            <div class="transport">車でFrümsenへ移動→ケーブルカーでSaxer Lücke</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">13:30</div>
+            <div class="location">Wasserauen → シルス</div>
+            <div class="activity">シルスへ移動</div>
+            <div class="transport">車で移動</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">16:00-20:00</div>
+            <div class="location">Chesa Muot Marias - Sils</div>
+            <div class="activity">チェックイン</div>
+            <div class="transport">チェックイン可能時間内</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> Chesa Muot Marias - Sils（7/20-22）
+        </div>
+    </div>
+
+    <!-- 7月21日 -->
+    <div class="day-section">
+        <div class="day-header">7月21日 (月) - シルス滞在</div>
+        
+        <div class="schedule-item">
+            <div class="time">終日</div>
+            <div class="location">シルス・エンガディン地方</div>
+            <div class="activity">【予定未定】ハイキング・観光など</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> Chesa Muot Marias - Sils
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>具体的なアクティビティや訪問先を記入してください</p>
+        </div>
+    </div>
+
+    <!-- 7月22日 -->
+    <div class="day-section">
+        <div class="day-header">7月22日 (火) - シルス滞在</div>
+        
+        <div class="schedule-item">
+            <div class="time">終日</div>
+            <div class="location">シルス・エンガディン地方</div>
+            <div class="activity">【予定未定】ハイキング・観光など</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> Chesa Muot Marias - Sils
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>具体的なアクティビティや訪問先を記入してください</p>
+        </div>
+    </div>
+
+    <!-- 7月23日 -->
+    <div class="day-section">
+        <div class="day-header">7月23日 (水) - シルス滞在</div>
+        
+        <div class="schedule-item">
+            <div class="time">終日</div>
+            <div class="location">シルス・エンガディン地方</div>
+            <div class="activity">【予定未定】観光・アクティビティ</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> Chesa Muot Marias - Sils
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>具体的なアクティビティや訪問先を記入してください</p>
+        </div>
+    </div>
+
+    <!-- 7月24日 -->
+    <div class="day-section">
+        <div class="day-header">7月24日 (木) - 移動日</div>
+        
+        <div class="schedule-item">
+            <div class="time">11:00まで</div>
+            <div class="location">Chesa Muot Marias - Sils</div>
+            <div class="activity">チェックアウト</div>
+            <div class="transport">シルス出発</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">日中</div>
+            <div class="location">Gelmerbahn</div>
+            <div class="activity">観光</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">午後</div>
+            <div class="location">Gelmerbahn → ラルデン</div>
+            <div class="activity">ラルデンへ移動</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">17:00-18:00</div>
+            <div class="location">studio suite im fresh-cube</div>
+            <div class="activity">チェックイン</div>
+            <div class="transport">住所: Rottenbett 2, 3931 Lalden, スイス</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> studio suite im fresh-cube (Lalden)
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>シルス→ラルデン移動中の観光地を記入してください</p>
+        </div>
+    </div>
+
+    <!-- 7月25日 -->
+    <div class="day-section">
+        <div class="day-header">7月25日 (金) - Almis Sunna到着</div>
+        
+        <div class="schedule-item">
+            <div class="time">00:00まで</div>
+            <div class="location">studio suite im fresh-cube</div>
+            <div class="activity">チェックアウト</div>
+            <div class="transport">※現地で時間要確認（00:00は不自然）</div>
+        </div>
+        
+        <div class="important">
+            <strong>要確認:</strong> チェックアウト時間00:00までは情報が不正確な可能性があります。現地で確認してください。
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">日中</div>
+            <div class="location">ツェルマット または グリンデルワルド</div>
+            <div class="activity">観光</div>
+            <div class="transport">天候次第でどちらかを選択・レンタカー利用</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">14:00以降</div>
+            <div class="location">Almis Sunna</div>
+            <div class="activity">チェックイン</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> Almis Sunna（7/25-26）
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>天候によりツェルマットかグリンデルワルドを選択</p>
+        </div>
+    </div>
+
+    <!-- 7月26日 -->
+    <div class="day-section">
+        <div class="day-header">7月26日 (土) - Almis Sunna滞在</div>
+        
+        <div class="schedule-item">
+            <div class="time">終日</div>
+            <div class="location">Almis Sunna周辺</div>
+            <div class="activity">【予定未定】アクティビティ・観光</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> Almis Sunna
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>具体的なアクティビティや訪問先を記入してください</p>
+        </div>
+    </div>
+
+    <!-- 7月27日 -->
+    <div class="day-section">
+        <div class="day-header">7月27日 (日) - Almis Sunna継続滞在</div>
+        
+        <div class="schedule-item">
+            <div class="time">終日</div>
+            <div class="location">Almis Sunna周辺</div>
+            <div class="activity">【予定未定】アクティビティ・観光</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> Almis Sunna（7/27-31）
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>具体的なアクティビティや訪問先を記入してください</p>
+        </div>
+    </div>
+
+    <!-- 7月28日-30日 -->
+    <div class="day-section">
+        <div class="day-header">7月28日 (月) - 30日 (水) - Almis Sunna滞在</div>
+        
+        <div class="schedule-item">
+            <div class="time">連日</div>
+            <div class="location">Almis Sunna周辺</div>
+            <div class="activity">【予定未定】各種アクティビティ・観光</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> Almis Sunna
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>3日間の詳細スケジュールを記入してください</p>
+        </div>
+    </div>
+
+    <!-- 7月31日 -->
+    <div class="day-section">
+        <div class="day-header">7月31日 (木) - Almis Sunna最終日</div>
+        
+        <div class="schedule-item">
+            <div class="time">10:00まで</div>
+            <div class="location">Almis Sunna</div>
+            <div class="activity">チェックアウト</div>
+            <div class="transport">荷物整理・出発準備</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">午前中</div>
+            <div class="location">Almis Sunna → ルツェルン</div>
+            <div class="activity">ルツェルンへ移動</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">午後</div>
+            <div class="location">ルツェルン</div>
+            <div class="activity">ルツェルン観光・買い物</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> ホテル アルピーナ ルツェルン（7/31-8/2）【暫定・変更可能性あり】
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>ルツェルンでの観光地・お土産購入など</p>
+        </div>
+    </div>
+
+    <!-- 8月1日 -->
+    <div class="day-section">
+        <div class="day-header">8月1日 (金) - ルツェルン滞在</div>
+        
+        <div class="schedule-item">
+            <div class="time">終日</div>
+            <div class="location">ルツェルン</div>
+            <div class="activity">【予定未定】観光・買い物</div>
+            <div class="transport">レンタカー利用</div>
+        </div>
+        
+        <div class="accommodation">
+            <strong>宿泊:</strong> ホテル アルピーナ ルツェルン（7/31-8/2）【暫定・変更可能性あり】
+        </div>
+        
+        <div class="memo">
+            <h4>メモ欄</h4>
+            <p>ルツェルンでの観光地・お土産購入など</p>
+        </div>
+    </div>
+
+    <!-- 8月2日 -->
+    <div class="day-section">
+        <div class="day-header">8月2日 (土) - 出発日</div>
+        
+        <div class="schedule-item">
+            <div class="time">チェックアウト</div>
+            <div class="location">ホテル アルピーナ ルツェルン</div>
+            <div class="activity">ホテル出発</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">12:00</div>
+            <div class="location">チューリッヒ空港</div>
+            <div class="activity">Hertzレンタカー返却</div>
+        </div>
+        
+        <div class="flight-info">
+            <div class="time">12:55</div>
+            <div class="location">チューリッヒ空港 (ZRH) 出発</div>
+            <div class="activity">SWISS LX160便 → 成田</div>
+            <div class="transport">フライト時間: 約11時間10分</div>
+        </div>
+        
+        <div class="important">
+            <strong>重要:</strong> 出発3時間前までに空港到着推奨
+        </div>
+    </div>
+
+    <!-- 8月3日 -->
+    <div class="day-section">
+        <div class="day-header">8月3日 (日) - 帰国日</div>
+        
+        <div class="schedule-item">
+            <div class="time">09:05</div>
+            <div class="location">成田空港 (NRT) 到着</div>
+            <div class="activity">入国・荷物受取</div>
+        </div>
+        
+        <div class="schedule-item">
+            <div class="time">午前中</div>
+            <div class="location">成田空港</div>
+            <div class="activity">帰宅</div>
+            <div class="transport">各自の交通手段で帰宅</div>
+        </div>
+    </div>
+
+    <!-- 重要情報 -->
+    <div class="day-section">
+        <div class="day-header">重要情報・連絡先</div>
+        
+        <div class="important">
+            <h4>フライト情報</h4>
+            <p><strong>予約コード:</strong> L642YW</p>
+            <p><strong>往路:</strong> 7/19 LX161 NRT 10:55 → ZRH 18:20</p>
+            <p><strong>復路:</strong> 8/2 LX160 ZRH 12:55 → NRT 09:05+1</p>
+        </div>
+        
+        <div class="important">
+            <h4>レンタカー情報</h4>
+            <p><strong>会社:</strong> Hertz</p>
+            <p><strong>期間:</strong> 7/20 7:00 - 8/2 12:00</p>
+            <p><strong>場所:</strong> チューリッヒ空港</p>
+            <p><strong>車種:</strong> VWポロ</p>
+        </div>
+        
+        <div class="memo">
+            <h4>緊急連絡先</h4>
+            <p>・現地緊急電話: 112（警察・消防・救急）</p>
+            <p>・在スイス日本総領事館: +41-31-300-2222</p>
+            <p>・海外旅行保険連絡先: 【保険会社情報を記入】</p>
+        </div>
+        
+        <div class="memo">
+            <h4>持参物チェックリスト</h4>
+            <p>□ パスポート □ 航空券 □ 海外旅行保険証</p>
+            <p>□ 国際運転免許証 □ クレジットカード □ 現金（CHF/EUR）</p>
+            <p>□ 充電器 □ 変換プラグ □ 薬類</p>
+            <p>□ 防寒具 □ 雨具 □ 歩きやすい靴</p>
+        </div>
+    </div>
+</body>
+</html>
