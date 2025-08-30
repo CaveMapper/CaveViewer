@@ -36,6 +36,8 @@
 
 <a href = "https://cavemapper.github.io/CaveViewer/Banba_ana/">**婆々穴／Banba ana**</a>
 
+<a href = "https://cavemapper.github.io/CaveViewer/Chouchin_ana/">**ちょうちん穴／chouchin ana**</a>
+
 ## バーチャル洞窟探索デモ
 <a href = "https://cavemapper.github.io/CaveViewer/CaveExplorer/" >**バーチャル洞窟探索デモ**</a> 
 
