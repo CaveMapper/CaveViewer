@@ -38,6 +38,8 @@
 
 <a href = "https://cavemapper.github.io/CaveViewer/Chouchin_ana/">**ちょうちん穴／chouchin ana**</a>
 
+<a href = "https://cavemapper.github.io/CaveViewer/Manganji_Kita_no_Tateana/">**満願寺北の竪穴／Manganji_Kita_no_Tateana**</a>
+
 ## バーチャル洞窟探索デモ
 <a href = "https://cavemapper.github.io/CaveViewer/CaveExplorer/" >**バーチャル洞窟探索デモ**</a> 
 
