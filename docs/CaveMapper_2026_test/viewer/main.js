@@ -42,6 +42,9 @@ const STRINGS = {
     dark: 'ダーク',
     light: 'ライト',
     reset_view: '視点リセット',
+    mouse_mode: 'マウス操作',
+    mouse_standard: '標準',
+    mouse_studio: 'Studio',
     loading: '読み込み中…',
     load_error: 'ファイルを読み込めませんでした',
     not_cavev: 'cavev形式ではないファイルです（表示を試みます）',
@@ -50,6 +53,7 @@ const STRINGS = {
     open_prompt: '.cavevファイルをここにドラッグ＆ドロップ するか',
     open_file: 'ファイルを選択',
     hint: '左ドラッグ: 回転　　右ドラッグ: 移動　　ホイール: ズーム',
+    hint_studio: '中ドラッグ: 回転　　Shift+中ドラッグ: 移動　　Ctrl+中ドラッグ: ドリー　　ホイール: ズーム',
     lang_button: 'English',
     type_rope: 'ロープ',
     type_note: 'ノート',
@@ -68,6 +72,9 @@ const STRINGS = {
     dark: 'Dark',
     light: 'Light',
     reset_view: 'Reset view',
+    mouse_mode: 'Mouse controls',
+    mouse_standard: 'Standard',
+    mouse_studio: 'Studio',
     loading: 'Loading…',
     load_error: 'Failed to load the file',
     not_cavev: 'Not a cavev file (attempting to display anyway)',
@@ -76,6 +83,7 @@ const STRINGS = {
     open_prompt: 'Drag & drop a .cavev file here, or',
     open_file: 'Choose file',
     hint: 'Left drag: rotate    Right drag: pan    Wheel: zoom',
+    hint_studio: 'Middle drag: rotate    Shift+Middle: pan    Ctrl+Middle: dolly    Wheel: zoom',
     lang_button: '日本語',
     type_rope: 'Rope',
     type_note: 'Note',
@@ -104,6 +112,9 @@ function applyI18n() {
   document.querySelectorAll('#anno-toggles label span').forEach((el) => {
     el.textContent = t(`type_${el.dataset.key}`);
   });
+  // 操作ヒント（マウス操作モードで文言が変わる）
+  document.getElementById('hint').textContent =
+    t(mouseMode === 'studio' ? 'hint_studio' : 'hint');
 }
 
 // ── 背景テーマ ────────────────────────────────────────────────────────────────
@@ -137,6 +148,73 @@ camera.add(headlight);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.1;
+controls.zoomSpeed = 2.0;   // ホイールズーム感度（既定1.0の2倍）
+
+// ── オンデマンド描画: 変化があったフレームだけレンダリングする
+// （常時描画はウィンドウ移動時等にDWM合成と競合してチラつく・無駄な消費電力）
+let needsRender = true;
+function invalidate() { needsRender = true; }
+controls.addEventListener('change', invalidate);
+
+// ── マウス操作モード（standard: 一般的な左ドラッグ回転 / studio: Studio同等の中ボタン主体）
+let mouseMode = localStorage.getItem('cavev_mouse') === 'studio' ? 'studio' : 'standard';
+
+function applyMouseMode() {
+  if (mouseMode === 'studio') {
+    // CaveMapperStudioと同じ: 中ドラッグ=回転 / Shift+中=移動 / Ctrl+中=ドリー
+    // （修飾キーの判定はpointerdownフックで行う）
+    controls.mouseButtons = {
+      LEFT: null, MIDDLE: THREE.MOUSE.ROTATE, RIGHT: null,
+    };
+  } else {
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN,
+    };
+  }
+  $('btn-mouse-standard').classList.toggle('active', mouseMode === 'standard');
+  $('btn-mouse-studio').classList.toggle('active', mouseMode === 'studio');
+  $('hint').textContent = t(mouseMode === 'studio' ? 'hint_studio' : 'hint');
+}
+
+// studioモードの修飾キー: OrbitControlsが読み取る前(captureフェーズ)に割当を差し替える。
+// 注意: OrbitControlsはROTATE割当のボタンをShift付きで押すと内部でパンに切り替える
+// （PAN割当だと逆に回転へ反転してしまう）ため、Shift+中はROTATEのままにしておく。
+canvas.addEventListener('pointerdown', (e) => {
+  if (mouseMode !== 'studio' || e.button !== 1) return;
+  controls.mouseButtons.MIDDLE = e.ctrlKey ? THREE.MOUSE.DOLLY : THREE.MOUSE.ROTATE;
+}, true);
+
+// ── カメラ操作終了時にスクリーン中央レイキャストで回転中心を自動更新
+// （CaveMapperStudioの「Rotate Around Selection」相当の追従。中央を通るレイ上の
+// 点にtargetを移すだけなので視界はジャンプしない）
+const _pivotRaycaster = new THREE.Raycaster();
+const _screenCenter = new THREE.Vector2(0, 0);
+
+function isChainVisible(obj) {
+  for (let p = obj; p; p = p.parent) {
+    if (p.visible === false) return false;
+  }
+  return true;
+}
+
+function updateOrbitPivot() {
+  if (!modelRoot) return;
+  _pivotRaycaster.setFromCamera(_screenCenter, camera);
+  let hits;
+  try {
+    hits = _pivotRaycaster.intersectObject(modelRoot, true);
+  } catch {
+    return;   // fat line等のレイキャスト例外は無視
+  }
+  for (const h of hits) {
+    // 対象は可視メッシュのみ（ラベルスプライト・ラインは回転中心にしない）
+    if (!h.object.isMesh || !isChainVisible(h.object)) continue;
+    controls.target.copy(h.point);
+    controls.update();
+    break;
+  }
+}
+controls.addEventListener('end', updateOrbitPivot);
 
 // ── シーン状態 ────────────────────────────────────────────────────────────────
 
@@ -146,6 +224,7 @@ let typeGroups = {};               // cm_type → 種別グループ Object3D
 let lineMaterials = [];            // fat line マテリアル（解像度・色更新対象）
 let monoMaterials = [];            // 黒系注記マテリアル（背景に応じ白/黒切替対象）
 let labelSwaps = [];               // ラベルテクスチャの白/黒差し替え {material, white, black}
+let surveySprites = [];            // 測線の数値ラベル（カリング表示中のみ表示）
 let fitSphere = null;              // 視点リセット用バウンディング球
 let cullingMode = false;
 
@@ -255,6 +334,7 @@ function onModelLoaded(gltf, displayName) {
   lineMaterials = [];
   monoMaterials = [];
   labelSwaps = [];
+  surveySprites = [];
 
   // cavemapperメタデータ検査（glTFトップレベルextras）
   const meta = gltf.parser.json.extras && gltf.parser.json.extras.cavemapper;
@@ -272,6 +352,8 @@ function onModelLoaded(gltf, displayName) {
   const lineObjects = [];
   const monoSet = new Set();
   const labelMatSet = new Set();
+  const labelBasicCache = new Map();   // 元マテリアル → アンリット変換後（共有維持）
+  const monoBasicCache = new Map();
   modelRoot.traverse((o) => {
     const ud = o.userData || {};
     if (ud.cm_kind === 'group' && ANNOTATION_TYPES.includes(ud.cm_type)) {
@@ -289,13 +371,37 @@ function onModelLoaded(gltf, displayName) {
         o.visible = false;
         return;
       }
-      (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => {
+      // ラベルテクスチャ・黒系注記は照明の影響を受けないアンリット材質に変換する
+      // （ライティング材質のままだと法線の向き次第で白が灰色に沈む）
+      const convert = (m) => {
         if (m.map) {
-          labelMatSet.add(m);          // テクスチャ文字（ノート/スケール等）
-        } else if (isMonoAnnotation(ud)) {
-          monoSet.add(m);              // 黒系ソリッド注記
+          let basic = labelBasicCache.get(m);
+          if (!basic) {
+            basic = new THREE.MeshBasicMaterial({
+              map: m.map,
+              transparent: true,
+              side: THREE.DoubleSide,
+              depthWrite: m.depthWrite,
+            });
+            labelBasicCache.set(m, basic);
+            labelMatSet.add(basic);    // テクスチャ文字（ノート/スケール等）
+          }
+          return basic;
         }
-      });
+        if (isMonoAnnotation(ud)) {
+          let basic = monoBasicCache.get(m);
+          if (!basic) {
+            basic = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+            monoBasicCache.set(m, basic);
+            monoSet.add(basic);        // 黒系ソリッド注記（色はsetBackgroundが設定）
+          }
+          return basic;
+        }
+        return m;
+      };
+      o.material = Array.isArray(o.material)
+        ? o.material.map(convert)
+        : convert(o.material);
     }
   });
 
@@ -335,8 +441,21 @@ function onModelLoaded(gltf, displayName) {
       const sprite = makeValueSprite(`${info.length.toFixed(2)} m`);
       sprite.position.copy(info.center);
       fat.add(sprite);
+      if (isSurvey) surveySprites.push(sprite);
+    }
+    // 測線: セグメント毎の長さも総延長の半分サイズで表示（1セグメントの場合は
+    // 総延長と同値になるため出さない）
+    if (isSurvey && info.segments.length >= 2) {
+      info.segments.forEach((seg) => {
+        const s = makeValueSprite(`${seg.length.toFixed(2)} m`, 0.5);
+        s.position.copy(seg.mid);
+        fat.add(s);
+        surveySprites.push(s);
+      });
     }
   });
+  // 測線ラベルの初期表示状態（ソリッド表示中は非表示）を反映
+  applyCulling();
 
   // ── 注記チェックボックス構築 ────────────────────────────────────────────
   buildAnnotationToggles();
@@ -357,10 +476,17 @@ function onModelLoaded(gltf, displayName) {
   // 現在の背景モードを黒系注記・ラベルテクスチャに反映
   setBackground(bgMode);
 
+  // E2Eテスト・デバッグ用の内部状態フック（機能への影響なし）
+  window.__cavevDebug = {
+    labelSwaps, monoMaterials, lineMaterials, typeGroups,
+    setBackground, camera, controls, THREE,
+  };
+
   $('file-name').textContent = displayName;
   document.title = `${displayName} — CaveMapper Viewer`;
   show('panel');
   show('hint');
+  invalidate();
 }
 
 /**
@@ -375,22 +501,29 @@ function measureLineGeometry(geom) {
   const a = new THREE.Vector3();
   const b = new THREE.Vector3();
   let length = 0;
+  const segments = [];
   for (let i = 0; i + 1 < count; i += 2) {
     a.fromBufferAttribute(pos, idx(i));
     b.fromBufferAttribute(pos, idx(i + 1));
-    length += a.distanceTo(b);
+    const segLen = a.distanceTo(b);
+    if (segLen <= 0) continue;
+    length += segLen;
+    segments.push({
+      length: segLen,
+      mid: new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5),
+    });
   }
   if (length <= 0) return null;
   geom.computeBoundingBox();
   const center = geom.boundingBox.getCenter(new THREE.Vector3());
-  return { length, center };
+  return { length, center, segments };
 }
 
 /**
  * 計測値ラベルのスプライトを生成する（スクリーン固定サイズ・常にカメラ正対・
  * 黒地半透明＋白文字。Studio内画面表示と同じルックで、背景モードに依存しない）。
  */
-function makeValueSprite(text) {
+function makeValueSprite(text, sizeScale = 1) {
   const fontPx = 44;
   const padX = 16;
   const padY = 10;
@@ -419,7 +552,7 @@ function makeValueSprite(text) {
     transparent: true,
   });
   const sprite = new THREE.Sprite(mat);
-  const h = 0.045;            // 画面高さに対する比率ベースのサイズ
+  const h = 0.045 * sizeScale;   // 画面高さに対する比率ベースのサイズ
   sprite.scale.set(h * (cv.width / cv.height), h, 1);
   sprite.renderOrder = 999;
   return sprite;
@@ -526,16 +659,23 @@ function buildAnnotationToggles() {
     const groups = types.map((tp) => typeGroups[tp]).filter(Boolean);
     if (groups.length === 0) return;   // ファイルに存在しない種別は表示しない
     const label = document.createElement('label');
+    label.classList.add('on');
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.checked = true;
     cb.addEventListener('change', () => {
       groups.forEach((g) => { g.visible = cb.checked; });
+      // 見た目はlabelのクラスで描画する（input:checked疑似クラスは
+      // QtWebEngineで再スタイルされない不具合があるため）
+      label.classList.toggle('on', cb.checked);
+      invalidate();
     });
+    const box = document.createElement('span');
+    box.className = 'cbox';
     const span = document.createElement('span');
     span.dataset.key = key;
     span.textContent = t(`type_${key}`);
-    label.append(cb, span);
+    label.append(cb, box, span);
     holder.appendChild(label);
   });
 }
@@ -547,6 +687,10 @@ function applyCulling() {
   // カメラ側の壁がカリングされ、外から洞窟内部が透けて見える。
   const side = cullingMode ? THREE.FrontSide : THREE.DoubleSide;
   caveMaterials.forEach((m) => { m.side = side; });
+  // 測線の数値ラベルはカリング表示中のみ表示する
+  // （ソリッド表示では測線自体が外壁に隠れて見えないため）
+  surveySprites.forEach((s) => { s.visible = cullingMode; });
+  invalidate();
 }
 
 function setCulling(on) {
@@ -573,6 +717,7 @@ function setBackground(mode) {
   });
   $('btn-bg-dark').classList.toggle('active', mode === 'dark');
   $('btn-bg-light').classList.toggle('active', mode === 'light');
+  invalidate();
 }
 
 // ── カメラ ───────────────────────────────────────────────────────────────────
@@ -600,14 +745,18 @@ function resize() {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     lineMaterials.forEach((m) => m.resolution.set(w, h));
+    invalidate();
   }
 }
 window.addEventListener('resize', resize);
 
 renderer.setAnimationLoop(() => {
   resize();
-  controls.update();
-  renderer.render(scene, camera);
+  controls.update();   // 操作・慣性減衰中はchangeイベント経由でinvalidateされる
+  if (needsRender) {
+    needsRender = false;
+    renderer.render(scene, camera);
+  }
 });
 
 // ── UIイベント ───────────────────────────────────────────────────────────────
@@ -617,6 +766,14 @@ $('btn-culling').addEventListener('click', () => setCulling(true));
 $('btn-bg-dark').addEventListener('click', () => setBackground('dark'));
 $('btn-bg-light').addEventListener('click', () => setBackground('light'));
 $('btn-reset').addEventListener('click', resetView);
+
+function setMouseMode(mode) {
+  mouseMode = mode;
+  localStorage.setItem('cavev_mouse', mode);
+  applyMouseMode();
+}
+$('btn-mouse-standard').addEventListener('click', () => setMouseMode('standard'));
+$('btn-mouse-studio').addEventListener('click', () => setMouseMode('studio'));
 
 $('btn-collapse').addEventListener('click', () => {
   const body = $('panel-body');
@@ -649,11 +806,14 @@ window.addEventListener('drop', (e) => {
 
 // ── 起動 ─────────────────────────────────────────────────────────────────────
 
-// URLパラメータ: file / mode(solid|culling) / bg(dark|light) / lang(ja|en)
+// URLパラメータ: file / mode(solid|culling) / bg(dark|light) / lang(ja|en) / mouse(standard|studio)
 const params = new URLSearchParams(location.search);
 
 const langParam = params.get('lang');
 if (langParam === 'ja' || langParam === 'en') lang = langParam;
+const mouseParam = params.get('mouse');
+if (mouseParam === 'studio' || mouseParam === 'standard') mouseMode = mouseParam;
+applyMouseMode();
 applyI18n();
 
 if (params.get('bg') === 'light') setBackground('light');

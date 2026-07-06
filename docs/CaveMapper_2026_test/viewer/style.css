@@ -62,7 +62,31 @@ html, body {
   cursor: pointer; font-size: 12px; line-height: 1.7;
   white-space: nowrap;
 }
-.anno-toggles input { accent-color: #3d6fb4; }
+/* チェックボックス: 見た目は .cbox スパンで描画し、状態は label.on クラスで切り替える。
+   （input:checked 疑似クラスはQtWebEngineで再描画されない不具合があるため使わない。
+   未チェック時はパネルに馴染むグレー） */
+.anno-toggles input { display: none; }
+.anno-toggles .cbox {
+  width: 13px; height: 13px;
+  border: 1px solid #62676e;
+  border-radius: 3px;
+  background: #454a52;
+  flex: none;
+  position: relative;
+}
+.anno-toggles label.on .cbox {
+  background: #3d6fb4;
+  border-color: #3d6fb4;
+}
+.anno-toggles label.on .cbox::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 0px;
+  width: 4px; height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
 
 .icon-btn {
   width: 22px; height: 22px;
