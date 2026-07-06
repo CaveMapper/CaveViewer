@@ -1,0 +1,150 @@
+/* CaveMapper Viewer スタイル */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: "Segoe UI", "Yu Gothic UI", "Hiragino Sans", sans-serif;
+  background: #2b2f36;
+}
+
+#view { display: block; width: 100%; height: 100%; touch-action: none; }
+
+.hidden { display: none !important; }
+
+/* ── 操作パネル ─────────────────────────────────────────── */
+.panel {
+  position: fixed; top: 12px; left: 12px;
+  width: 248px;
+  background: rgba(28, 31, 37, 0.88);
+  color: #e8eaed;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  user-select: none;
+  font-size: 13px;
+}
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px;
+}
+.panel-title { font-weight: 600; letter-spacing: 0.02em; }
+#panel-body { padding: 0 12px 12px; }
+
+.file-name {
+  font-size: 11px; color: #9aa0a6;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  margin-bottom: 10px;
+}
+
+.section { margin-bottom: 12px; }
+.section:last-child { margin-bottom: 0; }
+.section-label { font-size: 11px; color: #9aa0a6; margin-bottom: 5px; }
+.section.row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.footer-row { display: flex; justify-content: flex-end; }
+
+/* セグメントボタン（ソリッド/カリング・背景） */
+.seg { display: inline-flex; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; overflow: hidden; }
+.seg-btn {
+  padding: 4px 10px;
+  background: transparent; color: #c6c9ce;
+  border: none; cursor: pointer; font-size: 12px;
+  white-space: nowrap;
+}
+.seg-btn + .seg-btn { border-left: 1px solid rgba(255,255,255,0.2); }
+.seg-btn.active { background: #3d6fb4; color: #fff; }
+.seg-btn:hover:not(.active) { background: rgba(255,255,255,0.08); }
+
+/* 注記チェックボックス */
+.anno-toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; }
+.anno-toggles label {
+  display: flex; align-items: center; gap: 5px;
+  cursor: pointer; font-size: 12px; line-height: 1.7;
+  white-space: nowrap;
+}
+.anno-toggles input { accent-color: #3d6fb4; }
+
+.icon-btn {
+  width: 22px; height: 22px;
+  background: transparent; color: #c6c9ce;
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 5px;
+  cursor: pointer; line-height: 1;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.08); }
+
+.text-btn {
+  padding: 4px 10px;
+  background: transparent; color: #c6c9ce;
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+  cursor: pointer; font-size: 12px;
+  white-space: nowrap;
+}
+.text-btn:hover { background: rgba(255,255,255,0.08); }
+
+/* ── 操作ヒント ─────────────────────────────────────────── */
+.hint {
+  position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+  color: rgba(255,255,255,0.55);
+  font-size: 11px;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+body.bg-light .hint { color: rgba(0,0,0,0.45); text-shadow: none; }
+
+/* ── 警告バナー ─────────────────────────────────────────── */
+.warn {
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  max-width: min(90vw, 560px);
+  background: rgba(180, 120, 0, 0.92); color: #fff;
+  padding: 7px 14px; border-radius: 8px;
+  font-size: 12px;
+}
+
+/* ── オーバーレイ（ランディング/ローディング/エラー） ───── */
+.overlay {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(20, 22, 26, 0.75);
+  color: #e8eaed;
+}
+.overlay .card {
+  background: #23262c;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 32px 40px;
+  text-align: center;
+  max-width: min(90vw, 480px);
+}
+.overlay h1 { font-size: 20px; margin-bottom: 14px; }
+.overlay p { font-size: 13px; color: #c6c9ce; margin-bottom: 6px; }
+
+/* ドラッグ中の強調 */
+body.dragover .overlay .card { outline: 2px dashed #3d6fb4; outline-offset: 6px; }
+
+.file-btn {
+  display: inline-block; margin-top: 14px;
+  padding: 8px 18px;
+  background: #3d6fb4; color: #fff;
+  border-radius: 7px; cursor: pointer; font-size: 13px;
+}
+.file-btn:hover { background: #4a7dc4; }
+.file-btn input { display: none; }
+
+.spinner {
+  width: 34px; height: 34px;
+  margin: 0 auto 14px;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: #3d6fb4;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-title { font-weight: 600; color: #ff8a80 !important; }
+.error-detail { font-size: 12px; word-break: break-all; }
+
+/* モバイル */
+@media (max-width: 480px) {
+  .panel { width: calc(100vw - 24px); }
+  .hint { display: none; }
+}

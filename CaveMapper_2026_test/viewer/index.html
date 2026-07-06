@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>CaveMapper Viewer</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./lib/three.module.js",
+    "three/addons/": "./lib/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="view"></canvas>
+
+<!-- 操作パネル -->
+<div id="panel" class="panel hidden">
+  <div class="panel-header">
+    <span class="panel-title">CaveMapper Viewer</span>
+    <button id="btn-collapse" class="icon-btn" title="折りたたみ">−</button>
+  </div>
+  <div id="panel-body">
+    <div id="file-name" class="file-name"></div>
+
+    <div class="section">
+      <div class="section-label" data-i18n="view_mode"></div>
+      <div class="seg">
+        <button id="btn-solid"   class="seg-btn active" data-i18n="solid"></button>
+        <button id="btn-culling" class="seg-btn"        data-i18n="culling"></button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label" data-i18n="annotations"></div>
+      <div id="anno-toggles" class="anno-toggles"></div>
+    </div>
+
+    <div class="section row">
+      <div>
+        <div class="section-label" data-i18n="background"></div>
+        <div class="seg">
+          <button id="btn-bg-dark"  class="seg-btn active" data-i18n="dark"></button>
+          <button id="btn-bg-light" class="seg-btn"        data-i18n="light"></button>
+        </div>
+      </div>
+      <button id="btn-reset" class="text-btn" data-i18n="reset_view"></button>
+    </div>
+
+    <div class="section footer-row">
+      <button id="btn-lang" class="text-btn">English</button>
+    </div>
+  </div>
+</div>
+
+<!-- 操作ヒント -->
+<div id="hint" class="hint hidden" data-i18n="hint"></div>
+
+<!-- 警告バナー -->
+<div id="warn" class="warn hidden"></div>
+
+<!-- ランディング（?file= 未指定時） -->
+<div id="landing" class="overlay hidden">
+  <div class="card">
+    <h1>CaveMapper Viewer</h1>
+    <p data-i18n="open_prompt"></p>
+    <label class="file-btn">
+      <span data-i18n="open_file"></span>
+      <input id="file-input" type="file" accept=".cavev,.glb">
+    </label>
+  </div>
+</div>
+
+<!-- 読み込み中 -->
+<div id="loading" class="overlay hidden">
+  <div class="card">
+    <div class="spinner"></div>
+    <p><span data-i18n="loading"></span><span id="load-progress"></span></p>
+  </div>
+</div>
+
+<!-- エラー -->
+<div id="error" class="overlay hidden">
+  <div class="card">
+    <p class="error-title" data-i18n="load_error"></p>
+    <p id="error-detail" class="error-detail"></p>
+  </div>
+</div>
+
+<script type="module" src="./main.js"></script>
+</body>
+</html>
