@@ -13,10 +13,21 @@ import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 
 const SUPPORTED_FORMAT_VERSION = 1;
 
-// 注記種別（cm_type）の表示順
+// 注記種別（cm_type）の全種
 const ANNOTATION_TYPES = [
   'rope', 'note', 'survey', 'distance',
   'scale', 'direction', 'stand', 'crawl',
+];
+
+// 表示切替トグルの定義（人間は立ち/匍匐を1トグルに統合）
+const TOGGLE_DEFS = [
+  { key: 'rope',      types: ['rope'] },
+  { key: 'note',      types: ['note'] },
+  { key: 'survey',    types: ['survey'] },
+  { key: 'distance',  types: ['distance'] },
+  { key: 'scale',     types: ['scale'] },
+  { key: 'direction', types: ['direction'] },
+  { key: 'human',     types: ['stand', 'crawl'] },
 ];
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
@@ -46,8 +57,7 @@ const STRINGS = {
     type_distance: '距離計測',
     type_scale: 'スケールバー',
     type_direction: '方角',
-    type_stand: '人間（立ち）',
-    type_crawl: '人間（匍匐）',
+    type_human: '人間',
   },
   en: {
     view_mode: 'Cave mesh display',
@@ -73,8 +83,7 @@ const STRINGS = {
     type_distance: 'Distance',
     type_scale: 'Scale bar',
     type_direction: 'Direction',
-    type_stand: 'Human (standing)',
-    type_crawl: 'Human (crawling)',
+    type_human: 'Human',
   },
 };
 
@@ -93,7 +102,7 @@ function applyI18n() {
   document.documentElement.lang = lang;
   // 注記チェックボックスのラベルを更新
   document.querySelectorAll('#anno-toggles label span').forEach((el) => {
-    el.textContent = t(`type_${el.dataset.type}`);
+    el.textContent = t(`type_${el.dataset.key}`);
   });
 }
 
@@ -135,8 +144,20 @@ let modelRoot = null;              // 読み込んだ glTF シーン
 let caveMaterials = [];            // 洞窟メッシュのマテリアル（カリング切替対象）
 let typeGroups = {};               // cm_type → 種別グループ Object3D
 let lineMaterials = [];            // fat line マテリアル（解像度・色更新対象）
+let monoMaterials = [];            // 黒系注記マテリアル（背景に応じ白/黒切替対象）
+let labelSwaps = [];               // ラベルテクスチャの白/黒差し替え {material, white, black}
 let fitSphere = null;              // 視点リセット用バウンディング球
 let cullingMode = false;
+
+// 背景に応じて白/黒を切り替える黒系注記（cm_type / cm_part での判定条件）
+function isMonoAnnotation(ud) {
+  return ud.cm_kind === 'annotation' && (
+    ud.cm_type === 'scale'
+    || ud.cm_type === 'direction'
+    || ud.cm_part === 'leader'     // ノート引出線
+    || ud.cm_part === 'arrow'      // 距離計測の矢尻
+  );
+}
 
 // ── UI要素 ────────────────────────────────────────────────────────────────────
 
@@ -232,6 +253,8 @@ function onModelLoaded(gltf, displayName) {
   caveMaterials = [];
   typeGroups = {};
   lineMaterials = [];
+  monoMaterials = [];
+  labelSwaps = [];
 
   // cavemapperメタデータ検査（glTFトップレベルextras）
   const meta = gltf.parser.json.extras && gltf.parser.json.extras.cavemapper;
@@ -244,9 +267,11 @@ function onModelLoaded(gltf, displayName) {
   modelRoot = gltf.scene;
   scene.add(modelRoot);
 
-  // ── ノード走査: 種別グループ・洞窟メッシュ・ラインを収集 ──────────────
+  // ── ノード走査: 種別グループ・洞窟メッシュ・注記・ラインを収集 ──────────
   const caveMeshes = [];
   const lineObjects = [];
+  const monoSet = new Set();
+  const labelMatSet = new Set();
   modelRoot.traverse((o) => {
     const ud = o.userData || {};
     if (ud.cm_kind === 'group' && ANNOTATION_TYPES.includes(ud.cm_type)) {
@@ -258,7 +283,29 @@ function onModelLoaded(gltf, displayName) {
     if (o.isLineSegments || (o.isLine && !o.isLineSegments)) {
       lineObjects.push(o);
     }
+    if (ud.cm_kind === 'annotation' && o.isMesh) {
+      // 距離計測の焼き込み数値ラベルは非表示（ビューアーのスプライト表示で代替）
+      if (ud.cm_type === 'distance' && ud.cm_part === 'label') {
+        o.visible = false;
+        return;
+      }
+      (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => {
+        if (m.map) {
+          labelMatSet.add(m);          // テクスチャ文字（ノート/スケール等）
+        } else if (isMonoAnnotation(ud)) {
+          monoSet.add(m);              // 黒系ソリッド注記
+        }
+      });
+    }
   });
+
+  // ── 黒系注記・ラベルテクスチャの背景連動色 ──────────────────────────────
+  monoMaterials = [...monoSet];
+  labelSwaps = [...labelMatSet].map((m) => ({
+    material: m,
+    white: recolorTexture(m.map, '#ffffff'),
+    black: recolorTexture(m.map, '#1a1a1a'),
+  }));
 
   // ── 洞窟メッシュ: マテリアルをクローンして収集（カリング切替対象）──────
   // GLTFLoaderはマテリアルを共有し得るため、注記側に影響しないよう洞窟専用に
@@ -276,7 +323,20 @@ function onModelLoaded(gltf, displayName) {
   applyCulling();
 
   // ── LINESプリミティブ → fat line 置換（1px線の視認性対策）──────────────
-  lineObjects.forEach((line) => replaceWithFatLine(line));
+  // 測線・距離計測（寸法線）には計測値ラベルのスプライトを付与する
+  lineObjects.forEach((line) => {
+    const ud = line.userData || {};
+    const info = measureLineGeometry(line.geometry);
+    const fat = replaceWithFatLine(line);
+    if (!fat || !info) return;
+    const isSurvey   = ud.cm_type === 'survey' && ud.cm_part === 'body';
+    const isDimLine  = ud.cm_type === 'distance' && ud.cm_part === 'dim';
+    if (isSurvey || isDimLine) {
+      const sprite = makeValueSprite(`${info.length.toFixed(2)} m`);
+      sprite.position.copy(info.center);
+      fat.add(sprite);
+    }
+  });
 
   // ── 注記チェックボックス構築 ────────────────────────────────────────────
   buildAnnotationToggles();
@@ -294,10 +354,95 @@ function onModelLoaded(gltf, displayName) {
   }
   resetView();
 
+  // 現在の背景モードを黒系注記・ラベルテクスチャに反映
+  setBackground(bgMode);
+
   $('file-name').textContent = displayName;
   document.title = `${displayName} — CaveMapper Viewer`;
   show('panel');
   show('hint');
+}
+
+/**
+ * ラインジオメトリの総延長と中心（バウンディングボックス中心）を求める。
+ * LINESプリミティブ（index有無両対応）のセグメント長の総和 = 測線の総延長／寸法値。
+ */
+function measureLineGeometry(geom) {
+  const pos = geom.getAttribute('position');
+  if (!pos) return null;
+  const idx = (i) => (geom.index ? geom.index.getX(i) : i);
+  const count = geom.index ? geom.index.count : pos.count;
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  let length = 0;
+  for (let i = 0; i + 1 < count; i += 2) {
+    a.fromBufferAttribute(pos, idx(i));
+    b.fromBufferAttribute(pos, idx(i + 1));
+    length += a.distanceTo(b);
+  }
+  if (length <= 0) return null;
+  geom.computeBoundingBox();
+  const center = geom.boundingBox.getCenter(new THREE.Vector3());
+  return { length, center };
+}
+
+/**
+ * 計測値ラベルのスプライトを生成する（スクリーン固定サイズ・常にカメラ正対・
+ * 黒地半透明＋白文字。Studio内画面表示と同じルックで、背景モードに依存しない）。
+ */
+function makeValueSprite(text) {
+  const fontPx = 44;
+  const padX = 16;
+  const padY = 10;
+  const cv = document.createElement('canvas');
+  const ctx = cv.getContext('2d');
+  ctx.font = `${fontPx}px "Segoe UI", sans-serif`;
+  const textW = Math.ceil(ctx.measureText(text).width);
+  cv.width  = textW + padX * 2;
+  cv.height = fontPx + padY * 2;
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, cv.width, cv.height, 10);
+  ctx.fill();
+  ctx.font = `${fontPx}px "Segoe UI", sans-serif`;
+  ctx.fillStyle = '#ffffff';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, padX, cv.height / 2 + 2);
+
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const mat = new THREE.SpriteMaterial({
+    map: tex,
+    sizeAttenuation: false,   // カメラ距離に依らずスクリーン上で一定サイズ
+    depthTest: false,         // 壁越しでも読めるように前面表示
+    transparent: true,
+  });
+  const sprite = new THREE.Sprite(mat);
+  const h = 0.045;            // 画面高さに対する比率ベースのサイズ
+  sprite.scale.set(h * (cv.width / cv.height), h, 1);
+  sprite.renderOrder = 999;
+  return sprite;
+}
+
+/** ラベルテクスチャの文字色を差し替えたテクスチャを生成する（アルファ形状は維持） */
+function recolorTexture(srcTex, cssColor) {
+  const img = srcTex.image;
+  const cv = document.createElement('canvas');
+  cv.width = img.width;
+  cv.height = img.height;
+  const ctx = cv.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  ctx.globalCompositeOperation = 'source-in';   // 不透明部分だけを単色で塗る
+  ctx.fillStyle = cssColor;
+  ctx.fillRect(0, 0, cv.width, cv.height);
+
+  const tex = new THREE.CanvasTexture(cv);
+  tex.flipY = srcTex.flipY;                     // glTF由来はflipY=false
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = srcTex.wrapS;
+  tex.wrapT = srcTex.wrapT;
+  return tex;
 }
 
 /** 洞窟メッシュのマテリアルをクローンして matSet に登録する（元マテリアル単位で共有維持） */
@@ -332,7 +477,7 @@ function findGroup(cmType) {
 function replaceWithFatLine(line) {
   const geom = line.geometry;
   const posAttr = geom.getAttribute('position');
-  if (!posAttr) return;
+  if (!posAttr) return null;
 
   // セグメントごとの頂点ペア配列に展開（indexあり/なし両対応）
   const positions = [];
@@ -344,7 +489,7 @@ function replaceWithFatLine(line) {
   } else {
     for (let i = 0; i < posAttr.count; i++) pushVert(i);
   }
-  if (positions.length < 6) return;
+  if (positions.length < 6) return null;
 
   const fatGeom = new LineSegmentsGeometry();
   fatGeom.setPositions(positions);
@@ -369,6 +514,7 @@ function replaceWithFatLine(line) {
   line.parent.remove(line);
   geom.dispose();
   if (line.material && line.material.dispose) line.material.dispose();
+  return fat;
 }
 
 // ── 注記チェックボックス ──────────────────────────────────────────────────────
@@ -376,17 +522,19 @@ function replaceWithFatLine(line) {
 function buildAnnotationToggles() {
   const holder = $('anno-toggles');
   holder.innerHTML = '';
-  ANNOTATION_TYPES.forEach((type) => {
-    const group = typeGroups[type];
-    if (!group) return;   // ファイルに存在しない種別は表示しない
+  TOGGLE_DEFS.forEach(({ key, types }) => {
+    const groups = types.map((tp) => typeGroups[tp]).filter(Boolean);
+    if (groups.length === 0) return;   // ファイルに存在しない種別は表示しない
     const label = document.createElement('label');
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.checked = true;
-    cb.addEventListener('change', () => { group.visible = cb.checked; });
+    cb.addEventListener('change', () => {
+      groups.forEach((g) => { g.visible = cb.checked; });
+    });
     const span = document.createElement('span');
-    span.dataset.type = type;
-    span.textContent = t(`type_${type}`);
+    span.dataset.key = key;
+    span.textContent = t(`type_${key}`);
     label.append(cb, span);
     holder.appendChild(label);
   });
@@ -415,6 +563,14 @@ function setBackground(mode) {
   scene.background.set(BG[mode].clear);
   document.body.classList.toggle('bg-light', mode === 'light');
   lineMaterials.forEach((m) => m.color.set(BG[mode].line));
+  // 黒系注記（スケールバー・方角・引出線・矢尻）: ダーク時は白、ライト時は黒
+  const monoColor = mode === 'dark' ? 0xffffff : 0x1a1a1a;
+  monoMaterials.forEach((m) => m.color.set(monoColor));
+  // ラベルテクスチャ（ノート/スケールの文字）: 文字色を背景に合わせて差し替え
+  labelSwaps.forEach(({ material, white, black }) => {
+    material.map = mode === 'dark' ? white : black;
+    material.needsUpdate = true;
+  });
   $('btn-bg-dark').classList.toggle('active', mode === 'dark');
   $('btn-bg-light').classList.toggle('active', mode === 'light');
 }
