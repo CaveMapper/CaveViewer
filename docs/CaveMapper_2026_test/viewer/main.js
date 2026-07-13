@@ -19,15 +19,11 @@ const ANNOTATION_TYPES = [
   'scale', 'direction', 'stand', 'crawl',
 ];
 
-// 表示切替トグルの定義（人間は立ち/匍匐を1トグルに統合）
+// 表示切替トグルの定義
+// 注記: ロープ・ノート・方角・スケールバー・人間（立ち/匍匐） / 寸法: 測線・距離計測
 const TOGGLE_DEFS = [
-  { key: 'rope',      types: ['rope'] },
-  { key: 'note',      types: ['note'] },
-  { key: 'survey',    types: ['survey'] },
-  { key: 'distance',  types: ['distance'] },
-  { key: 'scale',     types: ['scale'] },
-  { key: 'direction', types: ['direction'] },
-  { key: 'human',     types: ['stand', 'crawl'] },
+  { key: 'anno', types: ['rope', 'note', 'scale', 'direction', 'stand', 'crawl'] },
+  { key: 'dims', types: ['survey', 'distance'] },
 ];
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
@@ -35,13 +31,17 @@ const TOGGLE_DEFS = [
 const STRINGS = {
   ja: {
     view_mode: '洞窟メッシュ表示',
-    solid: 'ソリッド',
-    culling: 'カリング',
+    solid: '外側',
+    culling: '内側',
     annotations: '注記表示',
+    camera: 'カメラ位置',
     background: '背景',
     dark: 'ダーク',
     light: 'ライト',
-    reset_view: '視点リセット',
+    reset_view: 'リセット',
+    language: '言語',
+    lang_ja: '日本語',
+    lang_en: '英語',
     mouse_mode: 'マウス操作',
     mouse_standard: '標準',
     mouse_studio: 'Studio',
@@ -54,24 +54,22 @@ const STRINGS = {
     open_file: 'ファイルを選択',
     hint: '左ドラッグ: 回転　　右ドラッグ: 移動　　ホイール: ズーム',
     hint_studio: '中ドラッグ: 回転　　Shift+中ドラッグ: 移動　　Ctrl+中ドラッグ: ドリー　　ホイール: ズーム',
-    lang_button: 'English',
-    type_rope: 'ロープ',
-    type_note: 'ノート',
-    type_survey: '測線',
-    type_distance: '距離計測',
-    type_scale: 'スケールバー',
-    type_direction: '方角',
-    type_human: '人間',
+    type_anno: '注記',
+    type_dims: '寸法',
   },
   en: {
     view_mode: 'Cave mesh display',
-    solid: 'Solid',
-    culling: 'Culling',
+    solid: 'Outside',
+    culling: 'Inside',
     annotations: 'Annotations',
+    camera: 'Camera',
     background: 'Background',
     dark: 'Dark',
     light: 'Light',
-    reset_view: 'Reset view',
+    reset_view: 'Reset',
+    language: 'Language',
+    lang_ja: 'Japanese',
+    lang_en: 'English',
     mouse_mode: 'Mouse controls',
     mouse_standard: 'Standard',
     mouse_studio: 'Studio',
@@ -84,14 +82,8 @@ const STRINGS = {
     open_file: 'Choose file',
     hint: 'Left drag: rotate    Right drag: pan    Wheel: zoom',
     hint_studio: 'Middle drag: rotate    Shift+Middle: pan    Ctrl+Middle: dolly    Wheel: zoom',
-    lang_button: '日本語',
-    type_rope: 'Rope',
-    type_note: 'Note',
-    type_survey: 'Survey line',
-    type_distance: 'Distance',
-    type_scale: 'Scale bar',
-    type_direction: 'Direction',
-    type_human: 'Human',
+    type_anno: 'Annotations',
+    type_dims: 'Dimensions',
   },
 };
 
@@ -106,12 +98,14 @@ function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     el.textContent = t(el.dataset.i18n);
   });
-  document.getElementById('btn-lang').textContent = t('lang_button');
   document.documentElement.lang = lang;
   // 注記チェックボックスのラベルを更新
-  document.querySelectorAll('#anno-toggles label span').forEach((el) => {
+  // （data-key を持つテキストスパンのみ。見た目描画用の .cbox スパンは対象外）
+  document.querySelectorAll('#anno-toggles label span[data-key]').forEach((el) => {
     el.textContent = t(`type_${el.dataset.key}`);
   });
+  document.getElementById('btn-lang-ja').classList.toggle('active', lang === 'ja');
+  document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
   // 操作ヒント（マウス操作モードで文言が変わる）
   document.getElementById('hint').textContent =
     t(mouseMode === 'studio' ? 'hint_studio' : 'hint');
@@ -158,6 +152,11 @@ controls.addEventListener('change', invalidate);
 
 // ── マウス操作モード（standard: 一般的な左ドラッグ回転 / studio: Studio同等の中ボタン主体）
 let mouseMode = localStorage.getItem('cavev_mouse') === 'studio' ? 'studio' : 'standard';
+
+// タッチ専用端末（マウス等の高精度ポインタが無い＝モバイル/タブレット）の判定。
+// タッチ操作はモード設定に依らずOrbitControls既定で有効なため、マウス操作の
+// メニューと操作ヒントは表示しない。
+const touchOnly = !window.matchMedia('(any-pointer: fine)').matches;
 
 function applyMouseMode() {
   if (mouseMode === 'studio') {
@@ -482,10 +481,11 @@ function onModelLoaded(gltf, displayName) {
     setBackground, camera, controls, THREE,
   };
 
-  $('file-name').textContent = displayName;
-  document.title = `${displayName} — CaveMapper Viewer`;
+  const titleEl = $('panel-title');
+  titleEl.textContent = displayName;
+  titleEl.title = displayName;   // 省略表示時のツールチップ
   show('panel');
-  show('hint');
+  if (!touchOnly) show('hint');
   invalidate();
 }
 
@@ -781,11 +781,13 @@ $('btn-collapse').addEventListener('click', () => {
   $('btn-collapse').textContent = collapsed ? '+' : '−';
 });
 
-$('btn-lang').addEventListener('click', () => {
-  lang = lang === 'ja' ? 'en' : 'ja';
-  localStorage.setItem('cavev_lang', lang);
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('cavev_lang', l);
   applyI18n();
-});
+}
+$('btn-lang-ja').addEventListener('click', () => setLang('ja'));
+$('btn-lang-en').addEventListener('click', () => setLang('en'));
 
 // ファイル選択・ドラッグ&ドロップ（ローカルファイル読み込み）
 $('file-input').addEventListener('change', (e) => {
@@ -815,6 +817,8 @@ const mouseParam = params.get('mouse');
 if (mouseParam === 'studio' || mouseParam === 'standard') mouseMode = mouseParam;
 applyMouseMode();
 applyI18n();
+
+if (touchOnly) hide('section-mouse');
 
 if (params.get('bg') === 'light') setBackground('light');
 if (params.get('mode') === 'culling') setCulling(true);

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <title>CaveMapper Viewer</title>
+<link rel="icon" type="image/png" href="./favicon.png">
 <link rel="stylesheet" href="./style.css">
 <script type="importmap">
 {
@@ -20,12 +21,10 @@
 <!-- 操作パネル -->
 <div id="panel" class="panel hidden">
   <div class="panel-header">
-    <span class="panel-title">CaveMapper Viewer</span>
+    <span id="panel-title" class="panel-title">CaveMapper Viewer</span>
     <button id="btn-collapse" class="icon-btn" title="折りたたみ">−</button>
   </div>
   <div id="panel-body">
-    <div id="file-name" class="file-name"></div>
-
     <div class="section">
       <div class="section-label" data-i18n="view_mode"></div>
       <div class="seg">
@@ -34,32 +33,38 @@
       </div>
     </div>
 
-    <div class="section">
+    <div class="section top">
       <div class="section-label" data-i18n="annotations"></div>
       <div id="anno-toggles" class="anno-toggles"></div>
     </div>
 
-    <div class="section row">
-      <div>
-        <div class="section-label" data-i18n="background"></div>
-        <div class="seg">
-          <button id="btn-bg-dark"  class="seg-btn active" data-i18n="dark"></button>
-          <button id="btn-bg-light" class="seg-btn"        data-i18n="light"></button>
-        </div>
-      </div>
+    <div class="section">
+      <div class="section-label" data-i18n="camera"></div>
       <button id="btn-reset" class="text-btn" data-i18n="reset_view"></button>
     </div>
 
     <div class="section">
+      <div class="section-label" data-i18n="background"></div>
+      <div class="seg">
+        <button id="btn-bg-dark"  class="seg-btn active" data-i18n="dark"></button>
+        <button id="btn-bg-light" class="seg-btn"        data-i18n="light"></button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label" data-i18n="language"></div>
+      <div class="seg">
+        <button id="btn-lang-ja" class="seg-btn" data-i18n="lang_ja"></button>
+        <button id="btn-lang-en" class="seg-btn" data-i18n="lang_en"></button>
+      </div>
+    </div>
+
+    <div id="section-mouse" class="section">
       <div class="section-label" data-i18n="mouse_mode"></div>
       <div class="seg">
         <button id="btn-mouse-standard" class="seg-btn active" data-i18n="mouse_standard"></button>
         <button id="btn-mouse-studio"   class="seg-btn"        data-i18n="mouse_studio"></button>
       </div>
-    </div>
-
-    <div class="section footer-row">
-      <button id="btn-lang" class="text-btn">English</button>
     </div>
   </div>
 </div>

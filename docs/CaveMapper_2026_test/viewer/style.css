@@ -14,7 +14,7 @@ html, body {
 
 /* ── 操作パネル ─────────────────────────────────────────── */
 .panel {
-  position: fixed; top: 12px; left: 12px;
+  position: fixed; top: 12px; right: 12px;
   width: 248px;
   background: rgba(28, 31, 37, 0.88);
   color: #e8eaed;
@@ -28,35 +28,41 @@ html, body {
   display: flex; align-items: center; justify-content: space-between;
   padding: 9px 12px;
 }
-.panel-title { font-weight: 600; letter-spacing: 0.02em; }
+.panel-title {
+  font-weight: 600; letter-spacing: 0.02em;
+  flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  margin-right: 8px;
+}
 #panel-body { padding: 0 12px 12px; }
 
-.file-name {
-  font-size: 11px; color: #9aa0a6;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+/* 各セクション: 左にラベル・右に操作UIの2列構成 */
+.section {
+  display: flex; align-items: center; gap: 8px;
   margin-bottom: 10px;
 }
-
-.section { margin-bottom: 12px; }
 .section:last-child { margin-bottom: 0; }
-.section-label { font-size: 11px; color: #9aa0a6; margin-bottom: 5px; }
-.section.row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
-.footer-row { display: flex; justify-content: flex-end; }
+.section-label { font-size: 11px; color: #9aa0a6; width: 96px; flex: none; }
+.section > :not(.section-label) { flex: 1; min-width: 0; }
+/* 複数行の操作UI（注記チェックボックス）はラベルを上端揃え */
+.section.top { align-items: flex-start; }
+.section.top .section-label { padding-top: 3px; }
 
-/* セグメントボタン（ソリッド/カリング・背景） */
-.seg { display: inline-flex; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; overflow: hidden; }
+/* セグメントボタン（外側/内側・背景・言語・マウス操作） */
+.seg { display: flex; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; overflow: hidden; }
 .seg-btn {
-  padding: 4px 10px;
+  flex: 1;
+  padding: 4px 0;
   background: transparent; color: #c6c9ce;
   border: none; cursor: pointer; font-size: 12px;
-  white-space: nowrap;
+  white-space: nowrap; text-align: center;
 }
 .seg-btn + .seg-btn { border-left: 1px solid rgba(255,255,255,0.2); }
 .seg-btn.active { background: #3d6fb4; color: #fff; }
 .seg-btn:hover:not(.active) { background: rgba(255,255,255,0.08); }
 
-/* 注記チェックボックス */
-.anno-toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; }
+/* 注記チェックボックス（縦積み） */
+.anno-toggles { display: flex; flex-direction: column; gap: 3px; }
 .anno-toggles label {
   display: flex; align-items: center; gap: 5px;
   cursor: pointer; font-size: 12px; line-height: 1.7;
@@ -97,11 +103,12 @@ html, body {
 .icon-btn:hover { background: rgba(255,255,255,0.08); }
 
 .text-btn {
+  width: 100%;
   padding: 4px 10px;
   background: transparent; color: #c6c9ce;
   border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
   cursor: pointer; font-size: 12px;
-  white-space: nowrap;
+  white-space: nowrap; text-align: center;
 }
 .text-btn:hover { background: rgba(255,255,255,0.08); }
 
