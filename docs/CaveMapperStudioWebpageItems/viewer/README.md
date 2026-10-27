@@ -56,14 +56,15 @@ http://localhost:8000/viewer/?file=../docs/banba_test02.cavev
   測線の数値ラベルは内側表示中のみ表示（外側表示では線自体が外壁に隠れるため）
 - カメラ操作終了時にスクリーン中央レイキャストで回転中心を自動更新
   （Studioの「Rotate Around Selection」相当・視界はジャンプしない）
-- マウス操作モード切替: 標準（左ドラッグ回転/右ドラッグ移動）と
-  Studio（中ドラッグ回転/Shift+中=移動/Ctrl+中=ドリー。CaveMapperStudioと同じ）
+- マウス操作: 標準（左ドラッグ回転/右ドラッグ移動）とStudio
+  （中ドラッグ回転/Shift+中=移動/Ctrl+中=ドリー。CaveMapperStudioと同じ）を
+  モード切替なしに常時両方受付
 - 背景 ダーク/ライト切替。黒系注記（スケールバー・方角・引出線・矢尻）は
   ダークで白／ライトで黒に、ノート/スケールの文字テクスチャも白/黒に連動
 - 日本語/英語UI切替（選択はlocalStorageに保存）
 - 測線・寸法線（GLTFのLINESプリミティブ）はピクセル幅指定のfat lineで描画
 - cavevメタデータ（`extras.cavemapper`）のformat/バージョン検査と警告表示
-- URLパラメータ: `file` / `mode=culling` / `bg=light` / `lang=en|ja` / `mouse=studio|standard`
+- URLパラメータ: `file` / `mode=culling` / `bg=light` / `lang=en|ja`
 - ラベルテクスチャ・黒系注記はアンリット材質に変換して描画
   （ライティング材質のままだと法線の向きで白が灰色に沈むため）
 

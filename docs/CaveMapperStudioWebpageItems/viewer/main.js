@@ -42,9 +42,6 @@ const STRINGS = {
     language: '言語',
     lang_ja: '日本語',
     lang_en: '英語',
-    mouse_mode: 'マウス操作',
-    mouse_standard: '標準',
-    mouse_studio: 'Studio',
     loading: '読み込み中…',
     load_error: 'ファイルを読み込めませんでした',
     not_cavev: 'cavev形式ではないファイルです（表示を試みます）',
@@ -52,8 +49,7 @@ const STRINGS = {
     no_cave: '洞窟メッシュが含まれていません',
     open_prompt: '.cavevファイルをここにドラッグ＆ドロップ するか',
     open_file: 'ファイルを選択',
-    hint: '左ドラッグ: 回転　　右ドラッグ: 移動　　ホイール: ズーム',
-    hint_studio: '中ドラッグ: 回転　　Shift+中ドラッグ: 移動　　Ctrl+中ドラッグ: ドリー　　ホイール: ズーム',
+    hint: '左/中ドラッグ: 回転　　右/Shift+中ドラッグ: 移動　　ホイール/Ctrl+中ドラッグ: ズーム',
     type_anno: '注記',
     type_dims: '寸法',
   },
@@ -70,9 +66,6 @@ const STRINGS = {
     language: 'Language',
     lang_ja: 'Japanese',
     lang_en: 'English',
-    mouse_mode: 'Mouse controls',
-    mouse_standard: 'Standard',
-    mouse_studio: 'Studio',
     loading: 'Loading…',
     load_error: 'Failed to load the file',
     not_cavev: 'Not a cavev file (attempting to display anyway)',
@@ -80,8 +73,7 @@ const STRINGS = {
     no_cave: 'No cave mesh found in this file',
     open_prompt: 'Drag & drop a .cavev file here, or',
     open_file: 'Choose file',
-    hint: 'Left drag: rotate    Right drag: pan    Wheel: zoom',
-    hint_studio: 'Middle drag: rotate    Shift+Middle: pan    Ctrl+Middle: dolly    Wheel: zoom',
+    hint: 'Left/Middle drag: rotate    Right/Shift+Middle: pan    Wheel/Ctrl+Middle: zoom',
     type_anno: 'Annotations',
     type_dims: 'Dimensions',
   },
@@ -106,9 +98,7 @@ function applyI18n() {
   });
   document.getElementById('btn-lang-ja').classList.toggle('active', lang === 'ja');
   document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
-  // 操作ヒント（マウス操作モードで文言が変わる）
-  document.getElementById('hint').textContent =
-    t(mouseMode === 'studio' ? 'hint_studio' : 'hint');
+  document.getElementById('hint').textContent = t('hint');
 }
 
 // ── 背景テーマ ────────────────────────────────────────────────────────────────
@@ -150,36 +140,22 @@ let needsRender = true;
 function invalidate() { needsRender = true; }
 controls.addEventListener('change', invalidate);
 
-// ── マウス操作モード（standard: 一般的な左ドラッグ回転 / studio: Studio同等の中ボタン主体）
-let mouseMode = localStorage.getItem('cavev_mouse') === 'studio' ? 'studio' : 'standard';
+// ── マウス操作: 「標準」（左ドラッグ回転／右ドラッグ移動）と「Studio」（中ドラッグ回転／
+// Shift+中=移動／Ctrl+中=ドリー）の両方を、モード切替なしに常時同時受付する。
+// LEFT/RIGHTは標準操作、MIDDLEはStudio操作（既定ROTATE、Ctrl押下時のみDOLLYへ差し替え）。
+controls.mouseButtons = {
+  LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.ROTATE, RIGHT: THREE.MOUSE.PAN,
+};
 
 // タッチ専用端末（マウス等の高精度ポインタが無い＝モバイル/タブレット）の判定。
-// タッチ操作はモード設定に依らずOrbitControls既定で有効なため、マウス操作の
-// メニューと操作ヒントは表示しない。
+// タッチ操作はOrbitControls既定で有効なため、操作ヒントは表示しない。
 const touchOnly = !window.matchMedia('(any-pointer: fine)').matches;
 
-function applyMouseMode() {
-  if (mouseMode === 'studio') {
-    // CaveMapperStudioと同じ: 中ドラッグ=回転 / Shift+中=移動 / Ctrl+中=ドリー
-    // （修飾キーの判定はpointerdownフックで行う）
-    controls.mouseButtons = {
-      LEFT: null, MIDDLE: THREE.MOUSE.ROTATE, RIGHT: null,
-    };
-  } else {
-    controls.mouseButtons = {
-      LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN,
-    };
-  }
-  $('btn-mouse-standard').classList.toggle('active', mouseMode === 'standard');
-  $('btn-mouse-studio').classList.toggle('active', mouseMode === 'studio');
-  $('hint').textContent = t(mouseMode === 'studio' ? 'hint_studio' : 'hint');
-}
-
-// studioモードの修飾キー: OrbitControlsが読み取る前(captureフェーズ)に割当を差し替える。
+// 中ドラッグのCtrl修飾（ドリー）: OrbitControlsが読み取る前(captureフェーズ)に割当を差し替える。
 // 注意: OrbitControlsはROTATE割当のボタンをShift付きで押すと内部でパンに切り替える
 // （PAN割当だと逆に回転へ反転してしまう）ため、Shift+中はROTATEのままにしておく。
 canvas.addEventListener('pointerdown', (e) => {
-  if (mouseMode !== 'studio' || e.button !== 1) return;
+  if (e.button !== 1) return;
   controls.mouseButtons.MIDDLE = e.ctrlKey ? THREE.MOUSE.DOLLY : THREE.MOUSE.ROTATE;
 }, true);
 
@@ -262,7 +238,13 @@ function showError(detail) {
 async function fetchWithProgress(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-  const total = Number(res.headers.get('Content-Length')) || 0;
+  // Content-Length は圧縮転送（gzip/br 等）時に圧縮後サイズを示すが、
+  // reader が返すのは展開後のバイト列なので、そのまま割ると 100% を超える。
+  // 圧縮転送時は割合表示をやめ、受信 MB 表示にする。
+  const encoding = (res.headers.get('Content-Encoding') || 'identity').toLowerCase();
+  const total = encoding === 'identity'
+    ? Number(res.headers.get('Content-Length')) || 0
+    : 0;
   const reader = res.body.getReader();
   const chunks = [];
   let received = 0;
@@ -272,7 +254,9 @@ async function fetchWithProgress(url) {
     chunks.push(value);
     received += value.length;
     const mb = (received / 1048576).toFixed(1);
-    $('load-progress').textContent = total
+    // ヘッダーが CORS で見えない等で圧縮を検出できなかった場合の保険として、
+    // 受信量が total を超えたら MB 表示に切り替える
+    $('load-progress').textContent = total && received <= total
       ? ` ${Math.round((received / total) * 100)}%`
       : ` ${mb} MB`;
   }
@@ -767,14 +751,6 @@ $('btn-bg-dark').addEventListener('click', () => setBackground('dark'));
 $('btn-bg-light').addEventListener('click', () => setBackground('light'));
 $('btn-reset').addEventListener('click', resetView);
 
-function setMouseMode(mode) {
-  mouseMode = mode;
-  localStorage.setItem('cavev_mouse', mode);
-  applyMouseMode();
-}
-$('btn-mouse-standard').addEventListener('click', () => setMouseMode('standard'));
-$('btn-mouse-studio').addEventListener('click', () => setMouseMode('studio'));
-
 $('btn-collapse').addEventListener('click', () => {
   const body = $('panel-body');
   const collapsed = body.classList.toggle('hidden');
@@ -808,17 +784,12 @@ window.addEventListener('drop', (e) => {
 
 // ── 起動 ─────────────────────────────────────────────────────────────────────
 
-// URLパラメータ: file / mode(solid|culling) / bg(dark|light) / lang(ja|en) / mouse(standard|studio)
+// URLパラメータ: file / mode(solid|culling) / bg(dark|light) / lang(ja|en)
 const params = new URLSearchParams(location.search);
 
 const langParam = params.get('lang');
 if (langParam === 'ja' || langParam === 'en') lang = langParam;
-const mouseParam = params.get('mouse');
-if (mouseParam === 'studio' || mouseParam === 'standard') mouseMode = mouseParam;
-applyMouseMode();
 applyI18n();
-
-if (touchOnly) hide('section-mouse');
 
 if (params.get('bg') === 'light') setBackground('light');
 if (params.get('mode') === 'culling') setCulling(true);
